@@ -23,27 +23,23 @@ namespace Api.Handlers
             return async context =>
             {
                 var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-                string title = exceptionHandlerFeature.Error.Message;
-                string type = exceptionHandlerFeature.Error.GetType().FullName ?? string.Empty;
-                int statusCode = 500;
-                string? details = env.IsDevelopment() ? exceptionHandlerFeature.Error.ToString() : null;
 
                 var state = new Dictionary<string, object>();
                 var logger = context.RequestServices.GetRequiredService<ILogger<ExceptionHandler>>();
 
                 var problem = new ProblemDetails
                 {
-                    Status = statusCode,
-                    Title = title,
-                    Detail = details,
-                    Type = type
+                    Status = 500,
+                    Title = exceptionHandlerFeature.Error.Message,
+                    Detail = env.IsDevelopment() ? exceptionHandlerFeature.Error.ToString() : null,
+                    Type = exceptionHandlerFeature.Error.GetType().Name ?? string.Empty
                 };
 
                 switch (exceptionHandlerFeature.Error)
                 {
                     case ValidationException ve:
-                        statusCode = 400;
                         var validationProblemDetails = new ValidationProblemDetails();
+                        validationProblemDetails.Status = 400;
                         validationProblemDetails.Type = ve.GetType().Name; // or just use ValidationException constant
 
                         if (ve.ValidationResult is ValidationResult failure)
@@ -82,7 +78,7 @@ namespace Api.Handlers
                     problem.Extensions["traceId"] = traceId;
                 }
 
-                context!.Response.StatusCode = statusCode;
+                context!.Response.StatusCode = problem.Status ?? 500;
                 context.Response.ContentType = ApplicationProblemJson;
                 var stream = context.Response.Body;
                 await JsonSerializer.SerializeAsync(stream, problem, problem.GetType()).ConfigureAwait(false);
