@@ -87,6 +87,7 @@ namespace Api
             app.UseHttpsRedirection();
             app.UseHeaderPropagation();
             app.UseForwardedHeaders();
+            app.UseStatusCodePages();
 
             app.UseRouting();
 
