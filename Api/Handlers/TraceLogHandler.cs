@@ -11,6 +11,8 @@ namespace Api.Handlers
 {
     internal class TraceLogHandler : DelegatingHandler
     {
+        public const string TraceMe = "traceme";
+
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Func<HttpResponseMessage, bool> _shouldLog;
 
@@ -25,7 +27,7 @@ namespace Api.Handlers
             bool logPayloads = false;
 
             // If you pass a query string parameter "traceme", HttpClient request/response will be logged.
-            bool traceMe = _httpContextAccessor.HttpContext.Request.Query.ContainsKey("traceme");
+            bool traceMe = _httpContextAccessor.HttpContext.Request.Query.ContainsKey(TraceMe);
 
             logPayloads = logPayloads || traceMe;
 
@@ -52,19 +54,19 @@ namespace Api.Handlers
                     var logger = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<ILogger<TraceLogHandler>>();
                     Dictionary<string, object> scope = new Dictionary<string, object>();
 
-                    scope.TryAdd("request_headers", request);
+                    scope.TryAdd("Service_RequestHeaders", request);
                     if (request?.Content != null)
                     {
-                        scope.Add("request_body", await request.Content.ReadAsStringAsync());
+                        scope.Add("Service_RequestBody", await request.Content.ReadAsStringAsync());
                     }
-                    scope.TryAdd("response_headers", response);
+                    scope.TryAdd("Service_ResponseHeaders", response);
                     if (response?.Content != null)
                     {
-                        scope.Add("response_body", await response.Content.ReadAsStringAsync());
+                        scope.Add("Service_ResponseBody", await response.Content.ReadAsStringAsync());
                     }
                     using (logger.BeginScope(scope))
                     {
-                        logger.LogInformation("[TRACE] request/response");
+                        logger.LogInformation("[TRACE] Service Request/Response");
                     }
                 }
             }

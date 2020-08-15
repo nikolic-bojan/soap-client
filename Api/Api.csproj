@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Gelf.Extensions.Logging" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" Version="3.1.7" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.7.0" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.7.0" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.7.0" />

@@ -35,23 +35,19 @@ namespace Api.Services
             }
             catch (FaultException e)
             {
-                _logger.LogError(e, "FaultException");
-                throw;
+                throw new ServiceException(e.Message, e);
             }
             catch (CommunicationException e)
             {
-                _logger.LogError(e, "CommunicationException");
-                throw;
+                throw new ServiceException(e.Message, e);
             }
             catch (TimeoutException e)
             {
-                _logger.LogError(e, "TimeoutException");
-                throw;
+                throw new ServiceException(e.Message, e);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Exception");
-                throw;
+                throw new ServiceException(e.Message, e);
             }
             finally
             {

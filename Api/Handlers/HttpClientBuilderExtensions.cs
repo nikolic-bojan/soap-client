@@ -17,5 +17,4 @@ namespace Api.Handlers
             return builder.AddHttpMessageHandler((services) => new TraceLogHandler(services.GetRequiredService<IHttpContextAccessor>(), (HttpResponseMessage) => { return false; }));
         }
     }
-
 }
