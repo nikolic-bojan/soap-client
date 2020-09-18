@@ -34,6 +34,8 @@ namespace Api
                 });
             });
 
+            services.Configure<HelloServiceOptions>(Configuration.GetSection("Services:Hello"));
+
             services.AddHttpContextAccessor();
             services.AddControllers();
 
@@ -50,7 +52,8 @@ namespace Api
             services.AddHttpClient(HelloService.ServiceName, config =>
                 {
                     // Some custom configuration like request timeout
-                    config.Timeout = TimeSpan.FromSeconds(5);
+                    // config.Timeout = TimeSpan.FromSeconds(5);
+                    // WARNING: Setting timeout like this will not work. You need to setup timeouts on your binding!!!
                 })
                 .AddTraceLogHandler((response) =>
                 {
