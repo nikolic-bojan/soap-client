@@ -5,6 +5,7 @@ using System;
 using System.Net.Http;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Api.Helpers;
 
 namespace Api.Services
 {
@@ -29,40 +30,13 @@ namespace Api.Services
 
         public async Task<string> SayHello(string firstName)
         {
-            bool success = false;
-            var channel = _client.ChannelFactory.CreateChannel();
-            try
+            return await SoapHelper.IssueSoapCallAsync(_client, async (channel) =>
             {
                 var result = await channel.sayHelloAsync(new sayHelloRequest(firstName));
-                
-                (channel as IClientChannel).Close();
-                success = true;
 
                 return result.greeting;
-            }
-            catch (FaultException e)
-            {
-                throw new ServiceException(e.Message, e);
-            }
-            catch (CommunicationException e)
-            {
-                throw new ServiceException(e.Message, e);
-            }
-            catch (TimeoutException e)
-            {
-                throw new ServiceException(e.Message, e);
-            }
-            catch (Exception e)
-            {
-                throw new ServiceException(e.Message, e);
-            }
-            finally
-            {
-                if (!success)
-                {
-                    (channel as IClientChannel)?.Abort();
-                }
-            }
+            }, _logger);
+
         }
     }
 }
