@@ -5,6 +5,7 @@ using System;
 using System.Net.Http;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Api.Helpers;
 
 namespace Api.Services
 {
@@ -34,7 +35,7 @@ namespace Api.Services
             try
             {
                 var result = await channel.sayHelloAsync(new sayHelloRequest(firstName));
-                
+
                 (channel as IClientChannel).Close();
                 success = true;
 
@@ -63,6 +64,20 @@ namespace Api.Services
                     (channel as IClientChannel)?.Abort();
                 }
             }
+        }
+
+        /* 
+         * Alternatively, we can abstract common SOAP logic to a separate helper method and 
+         * have it wrap around our business logic, like so:
+         */
+        public async Task<string> SayHelloWithHelper(string firstName)
+        {
+            return await SoapHelper.IssueSoapCallAsync(_client, async (channel) =>
+            {
+                var result = await channel.sayHelloAsync(new sayHelloRequest(firstName));
+
+                return result.greeting;
+            }, _logger);
         }
     }
 }
